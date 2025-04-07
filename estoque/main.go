@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"sync"
 )
@@ -96,4 +97,14 @@ func baixarEstoque(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write([]byte(`{"ok": true}`))
+}
+
+func main() {
+	http.HandleFunc("/produtos/validar", validarEstoque)
+	http.HandleFunc("/produtos/baixar", baixarEstoque)
+	http.HandleFunc("/produtos", cadastrarProduto)
+	http.HandleFunc("/produtos/listar", listarProdutos)
+
+	log.Println("O serviço de estoque rodando na porta 8081...")
+	log.Fatal(http.ListenAndServe(":8081", nil))
 }
