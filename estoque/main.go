@@ -38,3 +38,15 @@ func cadastrarProduto(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(p)
 }
+
+func listarProdutos(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	produtoMux.Lock()
+	defer produtoMux.Unlock()
+
+	json.NewEncoder(w).Encode(produtos)
+}
