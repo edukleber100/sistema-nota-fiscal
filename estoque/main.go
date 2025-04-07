@@ -50,3 +50,26 @@ func listarProdutos(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(produtos)
 }
+
+type RequisicaoEstoque struct {
+	Produtos []int `json:"produtos"`
+}
+
+func validarEstoque(w http.ResponseWriter, r *http.Request) {
+	var req RequisicaoEstoque
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Erro ao decodificar JSON", http.StatusBadRequest)
+		return
+	}
+
+	for _, id := range req.Produtos {
+		if produto, ok := produtos[id]; !ok || produto.Saldo <= 0 {
+			w.WriteHeader(http.StatusConflict)
+			w.Write([]byte(`{"ok": false}`))
+			return
+		}
+	}
+
+	w.Write([]byte(`{"ok": true}`))
+}
