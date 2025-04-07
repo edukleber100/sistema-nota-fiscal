@@ -73,3 +73,27 @@ func validarEstoque(w http.ResponseWriter, r *http.Request) {
 
 	w.Write([]byte(`{"ok": true}`))
 }
+
+func baixarEstoque(w http.ResponseWriter, r *http.Request) {
+	var req RequisicaoEstoque
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Erro ao decodificar JSON", http.StatusBadRequest)
+		return
+	}
+
+	for _, id := range req.Produtos {
+		if produto, ok := produtos[id]; !ok || produto.Saldo <= 0 {
+			http.Error(w, "Erro ao baixar estoque", http.StatusConflict)
+			return
+		}
+	}
+
+	for _, id := range req.Produtos {
+		produto := produtos[id]
+		produto.Saldo--
+		produtos[id] = produto
+	}
+
+	w.Write([]byte(`{"ok": true}`))
+}
