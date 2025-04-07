@@ -3,6 +3,8 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -98,4 +100,13 @@ func baixarEstoque(produtos []int) bool {
 		return false
 	}
 	return true
+}
+
+func main() {
+	http.HandleFunc("/notas", criarNotaFiscal)
+	http.HandleFunc("/notas/listar", listarNotasFiscais)
+	http.HandleFunc("/notas/imprimir/", imprimirNotaFiscal)
+
+	fmt.Println("Serviço de Faturamento rodando na porta 8082...")
+	log.Fatal(http.ListenAndServe(":8082", nil))
 }
